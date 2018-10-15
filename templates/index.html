@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>{% block title %}Index{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    {% for movie in movies %}
+    <div class="card mb-3">
+        <div class="card-header">#{{ movie.id }} {{ movie.title}} ({{ movie.categories }})</div>
+        <div class="card-body">
+            <p class="card-text">{{ movie.description }}</p>
+        </div>
+    </div>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>{% block title %}Search{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <div class="form-group">
+            <label for="query">Query</label>
+            <input class="form-control" type="text" name="query" id="query" required>
+        </div>
+
+        <input class="btn btn-primary" type="submit" value="Insert">
+    </form>
+{% endblock %}

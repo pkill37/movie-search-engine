@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{% block title %}{% endblock %} - Movie Search Engine</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="#">Movie Search Engine</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav">
+                        <a class="nav-item nav-link active" href="{{ url_for('index') }}">Index <span class="sr-only">(current)</span></a>
+                        <a class="nav-item nav-link" href="{{ url_for('insert') }}">Insert</a>
+                        <a class="nav-item nav-link" href="{{ url_for('search') }}">Search</a>
+                        <a class="nav-item nav-link" href="{{ url_for('analytics') }}">Analytics</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <section class="content">
+            <div class="container">
+                <header>
+                    {% block header %}{% endblock %}
+                </header>
+
+                {% for message in get_flashed_messages() %}
+                <div class="alert alert-danger" role="alert">{{ message }}</div>
+                {% endfor %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </section>
+    <body>
+</html>
