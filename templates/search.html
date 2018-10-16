@@ -11,6 +11,29 @@
             <input class="form-control" type="text" name="query" id="query" required>
         </div>
 
-        <input class="btn btn-primary" type="submit" value="Insert">
+        <div class="form-group">
+            <label for="link">Phrases Link Method</label>
+            <select class="form-control" name="link" id="link">
+                <option value="and" selected>Link phrases with AND boolean operator</option>
+                <option value="or">Link phrases with OR boolean operator</option>
+            </select>
+        </div>
+
+        <input class="btn btn-primary" type="submit" value="Search">
     </form>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='highlight.css') }}">
+    <script src="{{ url_for('static', filename='highlight.js') }}"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <pre>
+        <code class="sql">
+        select * from movies where to_tsvector(description) @@ to_tsquery('english', 'Lumberjack | Monkey & Shark & Tank');
+        select * from movies where to_tsvector(description) @@ to_tsquery('english', 'Lumberjack | Monkey & Shark & Tank');
+        </code>
+    </pre>
+
+    {% for result in results %}
+    {{ result }}
+    {% endfor %}
 {% endblock %}
