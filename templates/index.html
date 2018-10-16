@@ -7,7 +7,12 @@
 {% block content %}
     {% for movie in movies %}
     <div class="card mb-3">
-        <div class="card-header">#{{ movie.id }} {{ movie.title}} ({{ movie.categories }})</div>
+        <div class="card-header">
+            {{ movie.title}}
+            {% for category in movie.categories.split(';') %}
+            <span class="badge badge-pill badge-primary">{{ category }}</span>
+            {% endfor %}
+        </div>
         <div class="card-body">
             <p class="card-text">{{ movie.description }}</p>
         </div>
