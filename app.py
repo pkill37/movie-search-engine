@@ -34,8 +34,8 @@ def insert():
             for error in errors:
                 flash(error)
         else:
-            db.insert(
-                'INSERT INTO movies (title, categories, summary, description) VALUES(%s, %s, %s, %s)',
+            db.query(
+                'INSERT INTO movies VALUES(DEFAULT, %s, %s, %s, %s)',
                 (title, categories, summary, description)
             )
 
@@ -69,15 +69,15 @@ def search():
                     title,
                     description
                 FROM movies
-                WHERE to_tsvector(title) @@ to_tsquery(%s)'''
+                WHERE tsv @@ to_tsquery(%s)'''
             if link == 'and':
                 tsquery = ') & ('.join(phrases)
                 for i in range(1, len(phrases)):
-                    sql += '\n\t\tAND to_tsvector(title) @@ to_tsquery(%s)'
+                    sql += '\n\t\tAND tsv @@ to_tsquery(%s)'
             else:
                 tsquery = ') | ('.join(phrases)
                 for i in range(1, len(phrases)):
-                    sql += '\n\t\tOR to_tsvector(title) @@ to_tsquery(%s)'
+                    sql += '\n\t\tOR tsv @@ to_tsquery(%s)'
             tsquery = '(' + tsquery + ')'
 
             results = db.query(sql, phrases)

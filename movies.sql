@@ -1,3 +1,11 @@
+--------------------------------------------------------------------------------
+-- Extensions
+--------------------------------------------------------------------------------
+
+DROP EXTENSION IF EXISTS fuzzystrmatch;
+DROP EXTENSION IF EXISTS pg_trgm;
+DROP EXTENSION IF EXISTS tablefunc;
+
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; -- (soundex, levenshtein, metaphone)
 CREATE EXTENSION IF NOT EXISTS pg_trgm;       -- (similarity , show_Trgm,…, %, <->)
 CREATE EXTENSION IF NOT EXISTS tablefunc;     -- (crosstab)
@@ -13,8 +21,13 @@ CREATE TABLE movies(
     title character varying(255),
     categories character varying(255),
     summary text,
-    description text
+    description text,
+    tsv tsvector
 );
+
+CREATE TRIGGER tsv_update BEFORE INSERT OR UPDATE
+ON movies FOR EACH ROW EXECUTE PROCEDURE
+tsvector_update_trigger(tsv, 'pg_catalog.english', title, categories, summary, description);
 
 INSERT INTO movies VALUES (DEFAULT, 'Uprising Uptown', 'Action', 'A Fanciful Reflection of a Boy.', 'A Fanciful Reflection of a Boy And a Butler who must Pursue a Woman in Berlin');
 INSERT INTO movies VALUES (DEFAULT, 'Chamber Italian', 'Drama;Music', 'A Fateful Reflection of a Moose.', 'A Fateful Reflection of a Moose And a Husband who must Overcome a Monkey in Nigeria');

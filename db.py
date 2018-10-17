@@ -3,26 +3,33 @@ from psycopg2.extras import NamedTupleCursor
 
 
 class PostgresDatabase:
-    def __init__(self, dbname='movie-search-engine', user='fabio'):
-        self.con = psycopg2.connect(dbname=dbname, user=user, cursor_factory=NamedTupleCursor)
-        self.cur = self.con.cursor()
+    def __init__(self, name='movie-search-engine', user='fabio'):
+        self.name = name
+        self.user = user
         self.last_executed_query = ''
 
     def query(self, q, args=()):
-        self.last_executed_query = self.cur.mogrify(q, args).decode('utf-8')
-
+        self.con = psycopg2.connect(dbname=self.name, user=self.user, cursor_factory=NamedTupleCursor)
+        self.cur = self.con.cursor()
         try:
+            self.last_executed_query = self.cur.mogrify(q, args).decode('utf-8')
             self.cur.execute(q, args)
             self.con.commit()
             self.results = self.cur.fetchall()
-        except psycopg2.ProgrammingError:
+        except psycopg2.ProgrammingError as e:
+            self.last_executed_query = f'ERROR: {e}'
+            print(e)
             self.results = []
-        except Exception:
+        except Exception as e:
+            self.last_executed_query = f'ERROR: {e}'
+            print(e)
             if self.cur:
                 self.con.rollback()
         finally:
             if self.cur:
                 self.cur.close()
+            if self.con:
+                self.con.close()
         return self.results
 
     def close(self):
