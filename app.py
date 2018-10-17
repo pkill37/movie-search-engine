@@ -61,21 +61,26 @@ def search():
         else:
             phrases = shlex.split(query)
             phrases = [' & '.join(phrase.split(' ')) for phrase in phrases]
-            tsquery = ') & ('.join(phrases) if link == 'and' else ') | ('.join(phrases)
-            tsquery = '(' + tsquery + ')'
 
-            results = db.query(
-                '''
+            # Build query
+            sql = '''
                 SELECT
                     id,
                     title,
                     description
                 FROM movies
-                WHERE to_tsvector(title) @@ to_tsquery(%s)
-                   OR to_tsvector(description) @@ to_tsquery(%s)
-                ''',
-                (tsquery, tsquery)
-            )
+                WHERE to_tsvector(title) @@ to_tsquery(%s)'''
+            if link == 'and':
+                tsquery = ') & ('.join(phrases)
+                for i in range(1, len(phrases)):
+                    sql += '\n\t\tAND to_tsvector(title) @@ to_tsquery(%s)'
+            else:
+                tsquery = ') | ('.join(phrases)
+                for i in range(1, len(phrases)):
+                    sql += '\n\t\tOR to_tsvector(title) @@ to_tsquery(%s)'
+            tsquery = '(' + tsquery + ')'
+
+            results = db.query(sql, phrases)
             return render_template('search.html', results=results, query=db.last_executed_query)
     else:
         return render_template('search.html')
