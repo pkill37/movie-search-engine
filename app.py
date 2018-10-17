@@ -10,8 +10,6 @@ db = PostgresDatabase()
 @app.route('/')
 def index():
     movies = db.query('SELECT * FROM movies')
-    print(db.last_executed_query)
-    print(movies)
     return render_template('index.html', movies=movies)
 
 
@@ -78,7 +76,6 @@ def search():
                 ''',
                 (tsquery, tsquery)
             )
-            print(db.last_executed_query)
             return render_template('search.html', results=results, query=db.last_executed_query)
     else:
         return render_template('search.html')
