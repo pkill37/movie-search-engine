@@ -26,14 +26,17 @@
     <script src="{{ url_for('static', filename='highlight.js') }}"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 
+    {% if query %}
     <pre>
         <code class="sql">
-        select * from movies where to_tsvector(description) @@ to_tsquery('english', 'Lumberjack | Monkey & Shark & Tank');
-        select * from movies where to_tsvector(description) @@ to_tsquery('english', 'Lumberjack | Monkey & Shark & Tank');
+        {{ query }}
         </code>
     </pre>
+    {% endif %}
 
-    {% for result in results %}
-    {{ result }}
-    {% endfor %}
+    <ul>
+        {% for result in results %}
+        <li>{{ result.id }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

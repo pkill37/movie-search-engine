@@ -1,15 +1,17 @@
 from flask import Flask, request, redirect, url_for, render_template, flash
-import records
 import shlex
+from db import PostgresDatabase
 
 app = Flask(__name__)
 app.secret_key = 'N2gjLwBJNOKfGqIHFxlWhd9nZDn0THsx'
-db = records.Database('postgres://fabio@localhost:5432/movie-search-engine')
+db = PostgresDatabase()
 
 
 @app.route('/')
 def index():
     movies = db.query('SELECT * FROM movies')
+    print(db.last_executed_query)
+    print(movies)
     return render_template('index.html', movies=movies)
 
 
@@ -34,9 +36,9 @@ def insert():
             for error in errors:
                 flash(error)
         else:
-            db.query(
-                'INSERT INTO movies (title, categories, summary, description) VALUES(:title, :categories, :summary, :description)',
-                title=title, categories=categories, summary=summary, description=description
+            db.insert(
+                'INSERT INTO movies (title, categories, summary, description) VALUES(%s, %s, %s, %s)',
+                (title, categories, summary, description)
             )
 
             return redirect(url_for('index'))
@@ -63,7 +65,6 @@ def search():
             phrases = [' & '.join(phrase.split(' ')) for phrase in phrases]
             tsquery = ') & ('.join(phrases) if link == 'and' else ') | ('.join(phrases)
             tsquery = '(' + tsquery + ')'
-            print(tsquery)
 
             results = db.query(
                 '''
@@ -72,12 +73,13 @@ def search():
                     title,
                     description
                 FROM movies
-                WHERE to_tsvector(title) @@ to_tsquery(:tsquery)
-                OR to_tsvector(description) @@ to_tsquery(:tsquery)
+                WHERE to_tsvector(title) @@ to_tsquery(%s)
+                   OR to_tsvector(description) @@ to_tsquery(%s)
                 ''',
-                tsquery=tsquery
+                (tsquery, tsquery)
             )
-            return render_template('search.html', results=results)
+            print(db.last_executed_query)
+            return render_template('search.html', results=results, query=db.last_executed_query)
     else:
         return render_template('search.html')
 
@@ -87,5 +89,5 @@ def analytics():
     return render_template('analytics.html')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
