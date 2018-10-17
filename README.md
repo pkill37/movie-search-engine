@@ -16,3 +16,7 @@ In choosing which index type to use, GiST or GIN, consider these performance dif
 - GIN indexes are two-to-three times larger than GiST indexes
 
 As a rule of thumb, GIN indexes are best for static data because lookups are faster. For dynamic data, GiST indexes are faster to update. Specifically, GiST indexes are very good for dynamic data and fast if the number of unique words (lexemes) is under 100,000, while GIN indexes will handle 100,000+ lexemes better but are slower to update.
+
+## Rank
+
+`ts_rank` will rank all rows, most of which will probably have a ranking of 0, so it's faster to do a search without `ts_rank` in a subquery and then `ts_rank` said subquery results.

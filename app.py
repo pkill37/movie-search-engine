@@ -63,25 +63,29 @@ def search():
             phrases = [' & '.join(phrase.split(' ')) for phrase in phrases]
 
             # Build query
-            sql = '''
-                SELECT
-                    id,
-                    title,
-                    description
-                FROM movies
-                WHERE tsv @@ to_tsquery(%s)'''
+            sql = '''SELECT
+    id,
+    ts_headline(title, to_tsquery(%s)) AS title,
+    ts_headline(categories, to_tsquery(%s)) AS categories,
+    ts_headline(summary, to_tsquery(%s)) AS summary,
+    ts_headline(description, to_tsquery(%s)) AS description,
+    ts_rank(tsv, to_tsquery(%s)) AS rank
+FROM movies
+WHERE tsv @@ to_tsquery(%s)'''
             if link == 'and':
                 tsquery = ') & ('.join(phrases)
                 for i in range(1, len(phrases)):
-                    sql += '\n\t\tAND tsv @@ to_tsquery(%s)'
+                    sql += ' AND tsv @@ to_tsquery(%s)'
             else:
                 tsquery = ') | ('.join(phrases)
                 for i in range(1, len(phrases)):
-                    sql += '\n\t\tOR tsv @@ to_tsquery(%s)'
+                    sql += ' OR tsv @@ to_tsquery(%s)'
+            sql += '\nORDER BY rank DESC'
             tsquery = '(' + tsquery + ')'
 
-            results = db.query(sql, phrases)
-            return render_template('search.html', results=results, query=db.last_executed_query)
+            args = (tsquery, tsquery, tsquery, tsquery, tsquery, *phrases)
+            movies = db.query(sql, args)
+            return render_template('search.html', movies=movies, query=db.last_executed_query)
     else:
         return render_template('search.html')
 

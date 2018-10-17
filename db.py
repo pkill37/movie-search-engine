@@ -7,21 +7,20 @@ class PostgresDatabase:
         self.name = name
         self.user = user
         self.last_executed_query = ''
+        self.results = []
 
     def query(self, q, args=()):
         self.con = psycopg2.connect(dbname=self.name, user=self.user, cursor_factory=NamedTupleCursor)
         self.cur = self.con.cursor()
+        self.last_executed_query = self.cur.mogrify(q, args).decode('utf-8')
         try:
-            self.last_executed_query = self.cur.mogrify(q, args).decode('utf-8')
             self.cur.execute(q, args)
             self.con.commit()
             self.results = self.cur.fetchall()
         except psycopg2.ProgrammingError as e:
-            self.last_executed_query = f'ERROR: {e}'
             print(e)
             self.results = []
         except Exception as e:
-            self.last_executed_query = f'ERROR: {e}'
             print(e)
             if self.cur:
                 self.con.rollback()

@@ -12,10 +12,10 @@
         </div>
 
         <div class="form-group">
-            <label for="link">Phrases Link Method</label>
+            <label for="link">Matching Method</label>
             <select class="form-control" name="link" id="link">
-                <option value="and" selected>Link phrases with AND boolean operator</option>
-                <option value="or">Link phrases with OR boolean operator</option>
+                <option value="and">Exact Matching</option>
+                <option value="or" selected>Partial Matching</option>
             </select>
         </div>
 
@@ -27,16 +27,31 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     {% if query %}
-    <pre>
-        <code class="sql">
-        {{ query }}
-        </code>
-    </pre>
+    <h1 class="mt-3">Executed Query</h1>
+    <pre><code class="sql py-3 px-4">{{ query }}</code></pre>
     {% endif %}
 
-    <ul>
-        {% for result in results %}
-        <li>{{ result.id }}</li>
-        {% endfor %}
-    </ul>
+    <h1 class="mt-3">Results</h1>
+    {% if movies %}
+    {% for movie in movies %}
+    <div class="card mb-3">
+        <div class="card-header">
+            {{ movie.title | safe }}
+
+            {% for category in movie.categories.split(';') %}
+            <span class="badge badge-pill badge-primary">{{ category | safe }}</span>
+            {% endfor %}
+
+            <span class="float-right">
+                <span class="badge badge-pill badge-success">{{ movie.rank }}</span>
+            </span>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ movie.description | safe }}</p>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>No results were returned</p>
+    {% endif %}
 {% endblock %}
