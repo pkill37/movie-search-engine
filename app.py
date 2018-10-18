@@ -64,14 +64,15 @@ def search():
 
             # Build query
             sql = '''SELECT
-    id,
-    ts_headline(title, to_tsquery(%s)) AS title,
-    ts_headline(categories, to_tsquery(%s)) AS categories,
-    ts_headline(summary, to_tsquery(%s)) AS summary,
-    ts_headline(description, to_tsquery(%s)) AS description,
-    ts_rank(tsv, to_tsquery(%s)) AS rank
-FROM movies
-WHERE tsv @@ to_tsquery(%s)'''
+    search.id,
+    ts_headline(search.title, to_tsquery(%s)) AS title,
+    ts_headline(search.categories, to_tsquery(%s)) AS categories,
+    ts_headline(search.summary, to_tsquery(%s)) AS summary,
+    ts_headline(search.description, to_tsquery(%s)) AS description,
+    ts_rank(search.tsv, to_tsquery(%s)) AS rank
+FROM (SELECT id, title, categories, summary, description, tsv
+      FROM movies
+      WHERE tsv @@ to_tsquery(%s)'''
             if link == 'and':
                 tsquery = ') & ('.join(phrases)
                 for i in range(1, len(phrases)):
@@ -80,6 +81,7 @@ WHERE tsv @@ to_tsquery(%s)'''
                 tsquery = ') | ('.join(phrases)
                 for i in range(1, len(phrases)):
                     sql += ' OR tsv @@ to_tsquery(%s)'
+            sql += ') AS search'
             sql += '\nORDER BY rank DESC'
             tsquery = '(' + tsquery + ')'
 
