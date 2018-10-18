@@ -2,11 +2,9 @@
 -- Extensions
 --------------------------------------------------------------------------------
 
-DROP EXTENSION IF EXISTS fuzzystrmatch;
 DROP EXTENSION IF EXISTS pg_trgm;
 DROP EXTENSION IF EXISTS tablefunc;
 
-CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; -- (soundex, levenshtein, metaphone)
 CREATE EXTENSION IF NOT EXISTS pg_trgm;       -- (similarity , show_Trgm,…, %, <->)
 CREATE EXTENSION IF NOT EXISTS tablefunc;     -- (crosstab)
 
@@ -1038,6 +1036,6 @@ DROP TABLE IF EXISTS logs;
 
 CREATE TABLE logs(
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    query character varying(255),
-    date date
+    query text NOT NULL,
+    timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

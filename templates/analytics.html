@@ -5,4 +5,66 @@
 {% endblock %}
 
 {% block content %}
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Query</th>
+                <th scope="col">00-01</th>
+                <th scope="col">01-02</th>
+                <th scope="col">02-03</th>
+                <th scope="col">03-04</th>
+                <th scope="col">04-05</th>
+                <th scope="col">05-06</th>
+                <th scope="col">06-07</th>
+                <th scope="col">07-08</th>
+                <th scope="col">08-09</th>
+                <th scope="col">09-10</th>
+                <th scope="col">10-11</th>
+                <th scope="col">11-12</th>
+                <th scope="col">12-13</th>
+                <th scope="col">13-14</th>
+                <th scope="col">14-15</th>
+                <th scope="col">15-16</th>
+                <th scope="col">16-17</th>
+                <th scope="col">17-18</th>
+                <th scope="col">18-19</th>
+                <th scope="col">19-20</th>
+                <th scope="col">20-21</th>
+                <th scope="col">21-22</th>
+                <th scope="col">22-23</th>
+                <th scope="col">23-24</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for result in results %}
+        <tr>
+            <th scope="row">{{ result.query }}</th>
+            <td>{{ result.h00_01 }}</td>
+            <td>{{ result.h01_02 }}</td>
+            <td>{{ result.h02_03 }}</td>
+            <td>{{ result.h03_04 }}</td>
+            <td>{{ result.h04_05 }}</td>
+            <td>{{ result.h05_06 }}</td>
+            <td>{{ result.h06_07 }}</td>
+            <td>{{ result.h07_08 }}</td>
+            <td>{{ result.h08_09 }}</td>
+            <td>{{ result.h09_10 }}</td>
+            <td>{{ result.h10_11 }}</td>
+            <td>{{ result.h11_12 }}</td>
+            <td>{{ result.h12_13 }}</td>
+            <td>{{ result.h13_14 }}</td>
+            <td>{{ result.h14_15 }}</td>
+            <td>{{ result.h15_16 }}</td>
+            <td>{{ result.h16_17 }}</td>
+            <td>{{ result.h17_18 }}</td>
+            <td>{{ result.h18_19 }}</td>
+            <td>{{ result.h19_20 }}</td>
+            <td>{{ result.h20_21 }}</td>
+            <td>{{ result.h21_22 }}</td>
+            <td>{{ result.h22_23 }}</td>
+            <td>{{ result.h23_24 }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
