@@ -1,6 +1,7 @@
-from flask import Flask, request, redirect, url_for, render_template, flash
+from flask import Flask, Response, request, redirect, url_for, render_template, flash
 import shlex
 from db import PostgresDatabase
+import json
 
 app = Flask(__name__)
 app.secret_key = 'N2gjLwBJNOKfGqIHFxlWhd9nZDn0THsx'
@@ -90,6 +91,14 @@ FROM (SELECT id, title, categories, summary, description, tsv
             return render_template('search.html', movies=movies, query=db.last_executed_query)
     else:
         return render_template('search.html')
+
+
+@app.route('/autocomplete', methods=['GET'])
+def autocomplete():
+    term = request.args.get('term')
+    movies = db.query('SELECT title FROM movies WHERE similarity(lower(title), lower(%s)) > 0.1 ORDER BY similarity(lower(title), lower(%s)) DESC LIMIT 5', (term, term))
+    titles = [movie.title for movie in movies]
+    return Response(json.dumps(titles), mimetype='application/json')
 
 
 @app.route('/analytics')
