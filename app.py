@@ -103,21 +103,61 @@ def autocomplete():
     return Response(json.dumps(titles), mimetype='application/json')
 
 
+def build_date_interval(start, finish):
+    import datetime
+    dt = datetime.datetime.strptime(start, '%Y-%m-%d')
+    end = datetime.datetime.strptime(finish, '%Y-%m-%d')
+    step = datetime.timedelta(days=1)
+
+    result = []
+    while dt <= end:
+        result.append(dt.strftime('%Y-%m-%d'))
+        dt += step
+    return result
+
+
 @app.route('/analytics')
 def analytics():
-    results = db.query('''
-    SELECT * FROM crosstab('
-        SELECT
-            query,
-            CAST(EXTRACT(HOUR FROM timestamp) AS int) AS hour,
-            CAST(COUNT(*) AS int) AS occurrences
-        FROM logs
-        GROUP BY query, hour
-        ORDER BY query, hour
-        ', 'VALUES(0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23)'
-    ) AS pivot (query TEXT, h00_01 INT, h01_02 INT, h02_03 INT, h03_04 INT, h04_05 INT, h05_06 INT, h06_07 INT, h07_08 INT, h08_09 INT, h09_10 INT, h10_11 INT, h11_12 INT, h12_13 INT, h13_14 INT, h14_15 INT, h15_16 INT, h16_17 INT, h17_18 INT, h18_19 INT, h19_20 INT, h20_21 INT, h21_22 INT, h22_23 INT, h23_24 INT)
-ORDER BY query;
-''')
+    start = '2018-10-17'
+    finish = '2018-10-23'
+    granularity = 'day'
+
+    if granularity == 'day':
+        results = db.query('''
+        SELECT * FROM crosstab('
+            SELECT
+                query,
+                CAST(EXTRACT(HOUR FROM timestamp) AS int) AS hour,
+                CAST(COUNT(*) AS int) AS occurrences
+            FROM logs
+            WHERE timestamp::date >= '%s' AND timestamp::date <= '%s'
+            GROUP BY query, hour
+            ORDER BY query, hour
+            ', 'SELECT * FROM generate_series(0,23)'
+        ) AS pivot (query TEXT, h00_01 INT, h01_02 INT, h02_03 INT, h03_04 INT, h04_05 INT, h05_06 INT, h06_07 INT, h07_08 INT, h08_09 INT, h09_10 INT, h10_11 INT, h11_12 INT, h12_13 INT, h13_14 INT, h14_15 INT, h15_16 INT, h16_17 INT, h17_18 INT, h18_19 INT, h19_20 INT, h20_21 INT, h21_22 INT, h22_23 INT, h23_24 INT)
+        ORDER BY query''', (start, finish))
+    else:
+
+        sql = '''SELECT * FROM crosstab('
+            SELECT
+                query,
+                timestamp::date AS day,
+                CAST(COUNT(*) AS int) AS occurrences
+            FROM logs
+            WHERE timestamp::date >= '%s' AND timestamp::date <= '%s'
+            GROUP BY query, day
+            ORDER BY query, day',
+            'SELECT d::date FROM generate_series('%s'::date, '%s'::date, ''1 day''::interval) d'
+        )'''
+
+        sql += ' AS pivot(query TEXT'
+        for d in build_date_interval(start, finish):
+            sql += ', d' + d.replace('-', '_') + ' INT'
+        sql += ') ORDER BY query'
+
+        results = db.query(sql, (start, finish, start, finish))
+        print(db.last_executed_query)
+
     return render_template('analytics.html', results=results)
 
 
