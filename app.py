@@ -2,6 +2,7 @@ from flask import Flask, Response, request, redirect, url_for, render_template, 
 import shlex
 from db import PostgresDatabase
 import json
+import datetime
 
 app = Flask(__name__)
 app.secret_key = 'N2gjLwBJNOKfGqIHFxlWhd9nZDn0THsx'
@@ -103,8 +104,14 @@ def autocomplete():
     return Response(json.dumps(titles), mimetype='application/json')
 
 
+def validate(date_text):
+    try:
+        datetime.datetime.strptime(date_text, '%Y-%m-%d')
+    except ValueError:
+        raise ValueError("Incorrect data format, should be YYYY-MM-DD")
+
+
 def build_date_interval(start, finish):
-    import datetime
     dt = datetime.datetime.strptime(start, '%Y-%m-%d')
     end = datetime.datetime.strptime(finish, '%Y-%m-%d')
     step = datetime.timedelta(days=1)
@@ -119,9 +126,15 @@ def build_date_interval(start, finish):
 @app.route('/analytics', methods=('GET', 'POST'))
 def analytics():
     if request.method == 'POST':
-        start = request.form['start'].strip()
-        finish = request.form['finish'].strip()
-        granularity = request.form['granularity'].strip()
+        try:
+            start = request.form['start'].strip()
+            finish = request.form['finish'].strip()
+            granularity = request.form['granularity'].strip()
+            validate(start)
+            validate(finish)
+        except ValueError:
+            flash('Invalid start or finish dates')
+            return render_template('analytics.html')
 
         if granularity == 'hour':
             results = db.query('''
