@@ -5,7 +5,30 @@
 {% endblock %}
 
 {% block content %}
+    <form method="post">
+        <div class="form-group">
+            <label for="start">Interval Start</label>
+            <input class="form-control" type="text" name="start" id="start" required>
+        </div>
+
+        <div class="form-group">
+            <label for="finish">Interval Finish</label>
+            <input class="form-control" type="text" name="finish" id="finish" required>
+        </div>
+
+        <div class="form-group">
+            <label for="granularity">Granularity</label>
+            <select class="form-control" name="granularity" id="granularity">
+                <option value="day" selected>Per Day</option>
+                <option value="hour">Per Hour</option>
+            </select>
+        </div>
+
+        <input class="btn btn-primary" type="submit" value="Compute Analytics">
+    </form>
+
     {% if results %}
+    <h1>Analytics Results</h1>
     <table class="table table-bordered table-striped">
         <thead class="thead-dark">
             <tr>
