@@ -47,7 +47,7 @@ You can build more complex queries with the familiar `&`, `|` and `!` binary ope
 
 ## Indexes
 
-`tsvector` columns can be indexed using inverted indices, which work differently than your typical.
+`tsvector` columns can be indexed using inverted indices to speed up full text searches.
 
 In choosing which index type to use, GiST or GIN, consider these performance differences:
 
