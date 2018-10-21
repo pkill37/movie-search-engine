@@ -10,6 +10,14 @@ The need for proper full text search leads to an increase in the popularity of v
 
 In this experiment (a project for an Advanced Databases class) we will explore the built in full text search capabilities of PostgreSQL on a dummy movies database.
 
+## Schema
+
+The database schema used for this experiment is described in `movies.sql` and can be executed idempotently:
+
+```
+$ psql movie-search-engine
+movie-search-engine=# \i movies.sql
+```
 
 ## tsvector
 
@@ -47,8 +55,6 @@ You can build more complex queries with the familiar `&`, `|` and `!` binary ope
 
 ## Indexes
 
-`tsvector` columns can be indexed using inverted indices to speed up full text searches.
-
 In choosing which index type to use, GiST or GIN, consider these performance differences:
 
 - GIN index lookups are about three times faster than GiST
@@ -57,6 +63,12 @@ In choosing which index type to use, GiST or GIN, consider these performance dif
 - GIN indexes are two-to-three times larger than GiST indexes
 
 As a rule of thumb, GIN indexes are best for static data because lookups are faster. For dynamic data, GiST indexes are faster to update. Specifically, GiST indexes are very good for dynamic data and fast if the number of unique words (lexemes) is under 100,000, while GIN indexes will handle 100,000+ lexemes better but are slower to update.
+
+With that in mind, a GIN index was created on the `tsv` column to speed up full text searches:
+
+```
+CREATE INDEX tsv_index ON movies USING gin(tsv);
+```
 
 ## Rank Results
 
