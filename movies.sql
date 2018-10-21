@@ -1039,3 +1039,9 @@ CREATE TABLE logs(
     query text NOT NULL,
     timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+--------------------------------------------------------------------------------
+-- Indexes
+--------------------------------------------------------------------------------
+
+CREATE INDEX tsv_index ON movies USING gin(tsv);
