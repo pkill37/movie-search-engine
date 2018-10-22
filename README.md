@@ -1,5 +1,7 @@
 # movie-search-engine
 
+Exploration of PostgreSQL's built-in full text search capabilities
+
 ## Motivation
 
 The usual `LIKE`, `ILIKE` and `~` operators do not really fit the requirements of real world human search queries. They can match literal substrings in an arbitrary document, but they were not designed to take into account all instances, cases or tenses of any given word. To meet the needs of real world search patterns we need more sophisticated techniques that use natural language processing to ignore stop words (e.g. the, and), ignore casing, remove synonyms and employ stemming algorithms to obtain the resulting lexeme which is computed for every word of the document and represented as a vector for faster searching.
